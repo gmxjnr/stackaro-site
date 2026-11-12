@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stackaro | Push naar GitHub, je site staat live</title>
+<meta name="description" content="Stackaro host je website op een eigen subdomein met automatisch SSL. Push naar GitHub en je site staat live. Vraag een gratis demo aan.">
+<meta name="theme-color" content="#e8edf2">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2310202e'/%3E%3Cpath d='M8 21h16v3H8zM8 14.5h16v3H8zM8 8h16v3H8z' fill='%23fff'/%3E%3Cpath d='M8 8h7v3H8z' fill='%232f4bff'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --paper: #e8edf2;
+    --ink: #10202e;
+    --ink-soft: #46576a;
+    --line: #c3ced9;
+    --cobalt: #2f4bff;
+    --term: #0d1822;
+    --term-text: #c9d6e2;
+    --term-dim: #6f8296;
+    --ok: #4fd1a1;
+    --sans: "Avenir Next", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 4px; }
+
+  .wrap { width: min(1120px, 100% - 3rem); margin-inline: auto; }
+
+  /* header */
+  header.top { padding: 1.5rem 0; }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .brand { display: inline-flex; align-items: center; gap: .6rem; font-weight: 800; letter-spacing: -.02em; font-size: 1.2rem; text-decoration: none; }
+  .brand svg { width: 28px; height: 28px; }
+  .nav-cta {
+    font-weight: 600; font-size: .95rem; text-decoration: none;
+    padding: .55rem 1rem; border: 2px solid var(--ink); border-radius: 999px;
+  }
+  .nav-cta:hover { background: var(--ink); color: var(--paper); }
+
+  /* hero */
+  .hero { padding: clamp(2rem, 6vw, 5rem) 0 clamp(3rem, 7vw, 6rem); }
+  .hero .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+  h1 {
+    font-size: clamp(2.5rem, 6.4vw, 4.75rem);
+    line-height: .98;
+    letter-spacing: -.045em;
+    font-weight: 800;
+    margin: 0 0 1.5rem;
+    text-wrap: balance;
+  }
+  .lede { font-size: 1.2rem; color: var(--ink-soft); max-width: 34rem; margin: 0 0 2rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
+  .btn {
+    display: inline-block; font-weight: 700; text-decoration: none;
+    background: var(--cobalt); color: #fff; padding: .95rem 1.5rem; border-radius: 12px;
+    box-shadow: 0 2px 0 var(--ink);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+  .status { font-size: .95rem; color: var(--ink-soft); }
+
+  /* terminal */
+  .term {
+    background: var(--term); color: var(--term-text);
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 1px 0 #fff inset, 0 24px 48px -24px rgba(16,32,46,.55);
+    font-family: var(--mono); font-size: .86rem; line-height: 1.7;
+  }
+  .term-bar { display: flex; align-items: center; justify-content: space-between; padding: .7rem 1rem; border-bottom: 1px solid #1d2d3b; color: var(--term-dim); font-size: .78rem; }
+  .term-bar b { color: var(--term-text); font-weight: 600; }
+  .term-body { padding: 1rem 1.1rem 1.25rem; min-height: 19.5rem; }
+  .term-body div { white-space: pre-wrap; word-break: break-word; }
+  .dim { color: var(--term-dim); }
+  .ok { color: var(--ok); }
+  .url { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+  .js .term-body div { opacity: 0; }
+  .js .term-body div.show { opacity: 1; }
+  .cursor { display: inline-block; width: .55em; height: 1.05em; background: var(--term-text); vertical-align: -.2em; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* sections */
+  section.block { padding: clamp(3rem, 6vw, 5rem) 0; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); letter-spacing: -.035em; line-height: 1.08; margin: 0 0 2.5rem; font-weight: 800; max-width: 22ch; text-wrap: balance; }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; counter-reset: s; }
+  .steps li { counter-increment: s; position: relative; padding-top: 3.2rem; }
+  .steps li::before {
+    content: counter(s);
+    position: absolute; top: 0; left: 0;
+    width: 2.4rem; height: 2.4rem; display: grid; place-items: center;
+    background: var(--ink); color: var(--paper); border-radius: 50%; font-weight: 800;
+  }
+  .steps li:not(:last-child)::after { content: ""; position: absolute; top: 1.2rem; left: 3.2rem; right: -1.2rem; height: 2px; background: var(--line); }
+  .steps h3 { margin: 0 0 .4rem; font-size: 1.25rem; letter-spacing: -.02em; }
+  .steps p { margin: 0; color: var(--ink-soft); max-width: 28ch; }
+
+  dl.features { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(2rem, 5vw, 4rem); }
+  .features div { padding: 1.3rem 0; border-top: 1px solid var(--line); }
+  .features dt { font-weight: 700; font-size: 1.1rem; letter-spacing: -.015em; margin-bottom: .2rem; }
+  .features dd { margin: 0; color: var(--ink-soft); max-width: 40ch; }
+  .features code { font-family: var(--mono); font-size: .92em; background: #d7e0e9; padding: .1em .4em; border-radius: 5px; }
+
+  .demo { background: var(--ink); color: var(--paper); border-top: 0; }
+  .demo .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: end; }
+  .demo h2 { margin-bottom: 1rem; }
+  .demo p { margin: 0; color: #b6c4d2; max-width: 44ch; }
+  .demo .btn { background: #fff; color: var(--ink); box-shadow: 0 2px 0 var(--cobalt); justify-self: start; }
+  .demo .btn:hover { box-shadow: 0 0 0 var(--cobalt); }
+
+  footer { padding: 2rem 0 2.5rem; font-size: .95rem; color: var(--ink-soft); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem; }
+  footer a { font-weight: 600; color: var(--ink); text-underline-offset: 3px; }
+
+  @media (max-width: 860px) {
+    .hero .wrap, .demo .wrap { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 2rem; }
+    .steps li:not(:last-child)::after { display: none; }
+    dl.features { grid-template-columns: 1fr; }
+    .term-body { min-height: 18rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .cursor { animation: none; }
+    .btn { transition: none; }
+  }
+</style>
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Stackaro, naar de startpagina">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#10202e"/><path d="M8 21h16v3H8zM8 14.5h16v3H8zM8 8h16v3H8z" fill="#fff"/><path d="M8 8h7v3H8z" fill="#2f4bff"/></svg>
+      Stackaro
+    </a>
+    <a class="nav-cta" href="#demo">Gratis demo</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Push naar GitHub. Je site staat live.</h1>
+        <p class="lede">Stackaro bouwt je website en zet hem online op een eigen subdomein, met SSL dat vanzelf geregeld is. Je hoeft geen server te beheren.</p>
+        <div class="actions">
+          <a class="btn" href="#demo">Gratis demo aanvragen</a>
+          <span class="status">In ontwikkeling. Betalen kan nog niet.</span>
+        </div>
+      </div>
+
+      <div class="term" role="img" aria-label="Voorbeeld van een deploy: git push, bouwen, en daarna staat de site live op mijnsite.stackaro.nl">
+        <div class="term-bar"><span><b>mijnsite</b> / main</span><span>deploy #12</span></div>
+        <div class="term-body" id="log" aria-hidden="true">
+          <div><span class="dim">$</span> git push origin main</div>
+          <div class="dim">Push ontvangen van GitHub</div>
+          <div>Repository ophalen...</div>
+          <div>Bouwen in een geïsoleerde container</div>
+          <div class="dim">  npm ci</div>
+          <div class="dim">  npm run build</div>
+          <div>Bestanden klaarzetten</div>
+          <div>Nieuwe versie activeren</div>
+          <div class="ok">Live in 18 seconden</div>
+          <div><a class="url" tabindex="-1">https://mijnsite.stackaro.nl</a> <span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="werking">
+    <div class="wrap">
+      <h2>Van commit naar website in drie stappen</h2>
+      <ol class="steps">
+        <li>
+          <h3>Je pusht je code</h3>
+          <p>Koppel je GitHub-repository. Elke push naar je hoofdbranch start een nieuwe deploy.</p>
+        </li>
+        <li>
+          <h3>Stackaro bouwt hem</h3>
+          <p>Je build draait in een afgesloten container, los van andere sites.</p>
+        </li>
+        <li>
+          <h3>Je site staat live</h3>
+          <p>De nieuwe versie gaat in één keer online. Er is geen moment dat je site half kapot is.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block" id="inbegrepen">
+    <div class="wrap">
+      <h2>Wat je krijgt</h2>
+      <dl class="features">
+        <div>
+          <dt>Een eigen subdomein</dt>
+          <dd>Je site draait op <code>jouwnaam.stackaro.nl</code>, direct na je eerste deploy.</dd>
+        </div>
+        <div>
+          <dt>SSL zonder gedoe</dt>
+          <dd>Het slotje in de browser werkt meteen. Je regelt zelf geen certificaten.</dd>
+        </div>
+        <div>
+          <dt>Terugdraaien naar een eerdere versie</dt>
+          <dd>Stackaro bewaart je laatste versies. Gaat er iets mis, dan staat de vorige binnen een paar seconden weer online.</dd>
+        </div>
+        <div>
+          <dt>Voor sites die naar een map bouwen</dt>
+          <dd>Denk aan Vite, Astro of gewone HTML. Ondersteuning voor Next.js en andere Node-apps staat gepland.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="block demo" id="demo">
+    <div class="wrap">
+      <div>
+        <h2>Probeer Stackaro gratis</h2>
+        <p>Stackaro is nog in ontwikkeling en je kunt er nog niet voor betalen. Wil je weten hoe het werkt met jouw website? Vraag een demo aan en we zetten hem samen online.</p>
+      </div>
+      <!-- TODO: vervang dit adres door je echte contactadres -->
+      <a class="btn" href="mailto:hallo@stackaro.nl?subject=Gratis%20demo%20Stackaro">Gratis demo aanvragen</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; <span id="y">2026</span> Stackaro</span>
+    <span>Een <a href="https://gmxjnr.nl">gmxjnr</a> project</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    document.getElementById('y').textContent = new Date().getFullYear();
+    var lines = document.querySelectorAll('#log div');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { lines.forEach(function (l) { l.classList.add('show'); }); return; }
+    var delays = [0, 700, 500, 600, 450, 450, 700, 500, 700, 500];
+    var t = 400;
+    lines.forEach(function (l, i) {
+      t += delays[i] || 500;
+      setTimeout(function () { l.classList.add('show'); }, t);
+    });
+  })();
+</script>
+</body>
+</html>
